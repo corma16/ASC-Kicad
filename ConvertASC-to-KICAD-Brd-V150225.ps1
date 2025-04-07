@@ -1,4 +1,4 @@
-﻿Set-PSDebug -Trace 0
+Set-PSDebug -Trace 0
 
 
 $defaultfilename="test" #change output file
@@ -140,7 +140,6 @@ function readbom {
     # Step 1, skip all the headers leaving mostly just the data
     $bom1=@()
     $skip="on"
-    
     $bomcontents=(gc $bomfile ) 
     # Skip everything between a line containing one space, and the dashed header line. Last 2 ifs must be in that order. Skip is off to start with to skip the first header.
     foreach ($line in $bomcontents) {
@@ -670,11 +669,9 @@ if ($formatok -eq "Valid") {
 
 
 #bom
-if ($bomok -eq "Valid" -and ($bomfile -ne $null)) {
-    #if {$bomfile -ne $null) {
-     Write-Host Reading $bomfile.name
-     $bom=(readbom $bomfile)
-    #}
+if ($bomok -eq "Valid") {
+    Write-Host Reading $bomfile.name
+    $bom=(readbom $bomfile)
 } else {
     Write-Host -ForegroundColor red "It will work without a BOM file, but no component values will exist"
     Write-host "No BOM file. Skipping BOM"
@@ -709,7 +706,7 @@ if ($netsok -ne "Valid" ) {
 #pins
 if ($pinsok -ne "Valid") {
   Write-Host -ForegroundColor red "FATAL. Unrecognised $pinsok"
- # pause
+  pause
   exit
 } else {
     #make the pinstable and update the nettable for NC pins
@@ -1153,7 +1150,10 @@ foreach ($item in $partslist) {
                     }
                 }
 
-
+                if ($unit.count -eq 370 -and $row.pinnum -eq 370) {
+                    $row
+                    pause
+                }
 
                 $rowcount++
                 $LINE=$newline+'    (pin '+$PWR+ ' line (at '+$row.x+' '+$row.y+' '+$sideorientation+')(length '+$pinlength+' )(name "'+ $pinname +'"(effects (font(size 1.27 1.27))))(number "'+$pinnum +'"(effects(font(size 1.27 1.27)))))'
@@ -1422,7 +1422,7 @@ foreach ($part in $partslist) {
  #   pause
     $lastsize=$size
 }
- 
+
 <#$libout| out-file lib.txt -encoding ascii
 $schout=$schematicout
 $schout| out-file sch.txt -encoding ascii
@@ -1435,7 +1435,6 @@ $sch2out| out-file sch2.txt -encoding ascii#>
 
 $sch3out=$schematicout+")"+$schematic2out +")"
 $sch3out| out-file "$boardname.kicad_sch" -encoding ascii
-$expbom=".\"  +$boardname+ "-bom.txt" 
-$bom |out-file $expbom -encoding ascii
+
 Write-Host Done.
 Write-Host Note that the schematic relative locations are the same as the pcb.
